@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skeuomorphic Echoes — The Archive Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #040c04;
+  --bg-surface: #091609;
+  --bg-card: #0f240f;
+  --bg-card-hover: #153015;
+  --bg-overlay: rgba(5,14,5,0.96);
+  --border-subtle: rgba(102,255,102,0.1);
+  --border-rule: rgba(102,255,102,0.15);
+  --border-accent: rgba(102,255,102,0.3);
+  --border-accent-strong: rgba(102,255,102,0.55);
+  --text-primary: #66ff66;
+  --text-secondary: #55dd55;
+  --text-dim: #38a838;
+  --text-faint: #246d24;
+  --text-ghost: #0f3a0f;
+  --accent: #66ff66;
+  --accent-bright: #99ff99;
+  --accent-dim: #55dd55;
+  --accent-glow: rgba(102,255,102,0.12);
+  --accent-glow-strong: rgba(102,255,102,0.25);
+  --amber: #ffbb44;
+  --amber-dim: #cc9933;
+  --amber-glow: rgba(255,187,68,0.12);
+  --sensory-cyan: #44ffcc;
+  --sensory-amber: #ffbb44;
+  --sensory-green: #55ff55;
+  --sensory-blue: #44aaff;
+  --cart-badge: #ffbb44;
+  --danger: #ff5555;
+  --star: #ffbb44;
+  --star-empty: #1a5a1a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: 'IBM Plex Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* CRT EFFECTS */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.18) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.93; }
+  94% { opacity: 1; }
+  96% { opacity: 0.97; }
+  97% { opacity: 1; }
+}
+
+.page-container { animation: flicker 8s infinite; }
+
+.glow {
+  text-shadow: 0 0 6px rgba(102,255,102,0.5), 0 0 16px rgba(102,255,102,0.25), 0 0 32px rgba(102,255,102,0.1);
+}
+
+.glow-amber {
+  text-shadow: 0 0 6px rgba(255,187,68,0.5), 0 0 16px rgba(255,187,68,0.25);
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+  color: var(--text-primary);
+  margin-left: 2px;
+}
+
+/* TOP NAV */
+.top-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 48px;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border-rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(16px, 3vw, 32px);
+  z-index: 1000;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.nav-brand-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.nav-brand-title em { color: var(--amber); font-style: normal; }
+
+.nav-brand-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-link {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: none;
+  border: 1px solid transparent;
+  padding: 4px 12px;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+  background: var(--accent-glow);
+}
+
+.nav-link.active {
+  color: var(--bg-deep);
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.cart-btn { position: relative; }
+
+.cart-badge {
+  position: absolute;
+  top: -6px; right: -6px;
+  background: var(--amber);
+  color: var(--bg-deep);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px; height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cart-badge.visible { opacity: 1; transform: scale(1); }
+
+/* PAGE */
+.page-container { padding-top: 48px; min-height: 100vh; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* STOREFRONT */
+.storefront-hero {
+  padding: clamp(48px, 8vw, 100px) clamp(16px, 3vw, 32px) clamp(32px, 5vw, 60px);
+  border-bottom: 1px solid var(--border-rule);
+}
+
+.hero-system-line {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.hero-system-line .ok { color: var(--accent); }
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(48px, 10vw, 120px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -3px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.hero-title em { font-style: normal; color: var(--amber); }
+
+.hero-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 580px;
+  line-height: 1.7;
+  margin-top: 20px;
+}
+
+.hero-prompt {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.hero-prompt .cmd { color: var(--accent); }
+
+/* Section Headers */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-rule);
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.section-count {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+/* Collections */
+.collections-section {
+  padding: clamp(32px, 5vw, 56px) clamp(16px, 3vw, 32px);
+}
+
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.collection-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.collection-card:hover {
+  border-color: var(--border-accent-strong);
+  box-shadow: 0 0 20px rgba(102,255,102,0.06), inset 0 0 20px rgba(102,255,102,0.02);
+}
+
+.collection-card.limited:hover {
+  border-color: var(--border-accent);
+}
+
+.card-visual {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card-visual-text {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 4.5vw, 48px);
+  font-weight: 800;
+  line-height: 1.0;
+  text-align: center;
+  padding: 20px;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(102,255,102,0.35), 0 0 20px rgba(102,255,102,0.12);
+}
+
+.collection-card.limited .card-visual-text {
+  color: var(--text-dim);
+  text-shadow: none;
+}
+
+.card-body { padding: 16px 20px 20px; }
+
+.card-chain-num {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.collection-card.limited .card-title { color: var(--text-dim); }
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.collection-card.limited .card-desc { color: var(--text-dim); }
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-link-count {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+
+.card-status {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 3px 10px;
+  border: 1px solid;
+}
+
+.card-status.available { background: rgba(102,255,102,0.08); color: var(--accent); border-color: var(--border-accent); }
+.card-status.sold-out { background: rgba(255,85,85,0.06); color: #bb5555; border-color: rgba(255,85,85,0.2); }
+.card-status.pre-order { background: rgba(68,170,255,0.06); color: #5599cc; border-color: rgba(68,170,255,0.2); }
+.card-status.waitlist { background: rgba(187,85,255,0.06); color: #9966bb; border-color: rgba(187,85,255,0.2); }
+.card-status.members { background: rgba(255,187,68,0.06); color: var(--amber-dim); border-color: rgba(255,187,68,0.2); }
+
+/* COLLECTION VIEW */
+.collection-header {
+  padding: clamp(40px, 6vw, 64px) clamp(16px, 3vw, 32px) clamp(24px, 4vw, 40px);
+  border-bottom: 1px solid var(--border-rule);
+}
+
+.collection-breadcrumb {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.collection-breadcrumb span { cursor: pointer; transition: color 0.2s; }
+.collection-breadcrumb span:hover { color: var(--accent); }
+.collection-breadcrumb .sep { color: var(--text-faint); cursor: default; }
+.collection-breadcrumb .sep:hover { color: var(--text-faint); }
+
+.collection-name {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 7vw, 80px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -2px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.collection-name em { font-style: normal; color: var(--amber); }
+
+.collection-blurb {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+.products-section {
+  padding: clamp(24px, 4vw, 40px) clamp(16px, 3vw, 32px);
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* Product Card */
+.product-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.product-card:not(.locked-link):hover {
+  border-color: var(--border-accent-strong);
+  box-shadow: 0 0 24px rgba(102,255,102,0.06);
+}
+
+.product-card.locked-link {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.product-card.locked-link:hover { opacity: 0.48; }
+
+.product-visual {
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 20px;
+}
+
+.product-era {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-faint);
+  position: absolute;
+  top: 12px; left: 16px;
+}
+
+.product-link-num {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-faint);
+  position: absolute;
+  top: 12px; right: 16px;
+}
+
+.product-display {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  line-height: 1.0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.product-display .line1 {
+  font-size: clamp(22px, 3vw, 30px);
+  display: block;
+  color: var(--text-primary);
+}
+
+.product-display .line2 {
+  font-size: clamp(30px, 4vw, 44px);
+  color: var(--amber);
+  display: block;
+  text-shadow: 0 0 12px rgba(255,187,68,0.2);
+}
+
+.product-card.locked-link .product-display .line1 { color: var(--text-faint); }
+.product-card.locked-link .product-display .line2 { color: var(--text-faint); text-shadow: none; }
+
+.product-info { padding: 16px 20px 20px; }
+
+.product-date-range {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--accent-dim);
+  margin-bottom: 6px;
+}
+
+.product-card.locked-link .product-date-range { color: var(--text-faint); }
+
+.product-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.product-card.locked-link .product-name { color: var(--text-dim); }
+
+.product-teaser {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-card.locked-link .product-teaser { color: var(--text-faint); }
+
+.product-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-add-cart, .btn-view {
+  padding: 8px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: 1px solid var(--border-accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-cart { flex: 1; }
+
+.btn-add-cart:hover {
+  background: var(--accent-glow);
+  box-shadow: 0 0 12px rgba(102,255,102,0.08);
+}
+
+.btn-add-cart.in-cart {
+  background: var(--accent);
+  color: var(--bg-deep);
+  font-weight: 600;
+}
+
+.btn-view { border-color: var(--border-subtle); color: var(--text-dim); }
+.btn-view:hover { border-color: var(--border-accent); color: var(--accent); }
+
+.btn-locked {
+  flex: 1;
+  padding: 8px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: 1px solid var(--text-faint);
+  background: transparent;
+  color: var(--text-faint);
+  cursor: default;
+}
+
+/* DETAIL VIEW */
+.detail-view {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 48px) clamp(16px, 3vw, 32px);
+}
+
+.detail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.detail-back {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+}
+
+.detail-back:hover { color: var(--accent); }
+
+.detail-pager { display: flex; gap: 8px; }
+
+.detail-pager button {
+  padding: 5px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.detail-pager button:hover:not(:disabled) { border-color: var(--border-accent); color: var(--accent); }
+.detail-pager button:disabled { opacity: 0.25; cursor: default; }
+
+.detail-display {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border-rule);
+}
+
+.detail-era {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.detail-era .num { color: var(--accent); }
+
+.detail-big-type {
+  font-family: 'Syne', sans-serif;
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -2px;
+  margin-bottom: 20px;
+}
+
+.detail-big-type .dline { display: block; }
+.detail-big-type .s48 { font-size: clamp(36px, 6vw, 56px); font-weight: 700; color: var(--text-primary); text-shadow: 0 0 8px rgba(102,255,102,0.3); }
+.detail-big-type .s64 { font-size: clamp(48px, 8vw, 80px); font-weight: 800; color: var(--amber); text-shadow: 0 0 12px rgba(255,187,68,0.25); }
+
+.detail-date {
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.detail-add-cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: 1px solid var(--border-accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.detail-add-cart:hover { background: var(--accent-glow); box-shadow: 0 0 16px rgba(102,255,102,0.08); }
+.detail-add-cart.in-cart { background: var(--accent); color: var(--bg-deep); font-weight: 600; }
+
+/* Quote */
+.detail-quote {
+  font-size: clamp(16px, 2vw, 20px);
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 6px;
+  padding-left: 16px;
+  border-left: 2px solid var(--amber);
+}
+
+.detail-quote-attr {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding-left: 16px;
+  margin-bottom: 32px;
+}
+
+/* Body */
+.detail-body {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.detail-body strong { color: var(--text-primary); font-weight: 500; }
+
+/* PRODUCT SPECS — unique e-commerce schema */
+.detail-specs {
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 32px;
+}
+
+.specs-header {
+  padding: 12px 16px;
+  background: rgba(102,255,102,0.04);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--text-dim);
+}
+
+.spec-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.spec-row:last-child { border-bottom: none; }
+
+.spec-key {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  padding: 10px 16px;
+  background: rgba(102,255,102,0.02);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.spec-val {
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding: 10px 16px;
+  line-height: 1.6;
+}
+
+/* CUSTOMER REVIEWS — unique e-commerce schema */
+.detail-reviews { margin-bottom: 32px; }
+
+.reviews-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.reviews-avg {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.review-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  padding: 16px 20px;
+  margin-bottom: 10px;
+}
+
+.review-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.review-stars {
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+.review-stars .filled { color: var(--star); }
+.review-stars .empty { color: var(--star-empty); }
+
+.review-author {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.review-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.review-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.review-tag {
+  display: inline-block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  margin-top: 8px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+}
+
+/* WHAT'S IN THE BOX */
+.detail-box {
+  margin-bottom: 32px;
+}
+
+.box-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.box-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.box-item {
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+}
+
+.box-item-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-dim);
+  margin-bottom: 4px;
+}
+
+.box-item-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* COMPATIBILITY */
+.detail-compat {
+  margin-bottom: 32px;
+}
+
+.compat-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.compat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.compat-card {
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+}
+
+.compat-card.works { border-top: 2px solid var(--accent); }
+.compat-card.replaced { border-top: 2px solid var(--danger); }
+
+.compat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.compat-card.works .compat-label { color: var(--accent); }
+.compat-card.replaced .compat-label { color: #cc5555; }
+
+.compat-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* SHIPPING & AVAILABILITY */
+.detail-shipping {
+  background: rgba(255,187,68,0.04);
+  border: 1px solid rgba(255,187,68,0.2);
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.shipping-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--amber);
+  margin-bottom: 8px;
+}
+
+.shipping-text {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+/* Footnote */
+.detail-footnote {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-dim);
+  line-height: 1.6;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* CART VIEW */
+.cart-header {
+  padding: clamp(40px, 6vw, 64px) clamp(16px, 3vw, 32px) clamp(24px, 4vw, 40px);
+  border-bottom: 1px solid var(--border-rule);
+}
+
+.cart-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 6vw, 56px);
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.cart-title em { color: var(--amber); font-style: normal; }
+
+.cart-subtitle {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+.cart-content {
+  padding: clamp(24px, 4vw, 40px) clamp(16px, 3vw, 32px);
+  max-width: 760px;
+}
+
+.cart-empty {
+  text-align: center;
+  padding: 60px 20px;
+  border: 1px dashed var(--border-subtle);
+}
+
+.cart-empty-icon {
+  font-size: 14px;
+  color: var(--text-faint);
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+
+.cart-empty-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.cart-empty-hint { font-size: 13px; color: var(--text-faint); }
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 24px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.cart-item:last-child { border-bottom: none; }
+.cart-item:hover { background: var(--bg-card-hover); box-shadow: inset 2px 0 0 var(--accent); }
+
+.cart-item-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent);
+  text-align: center;
+  text-shadow: 0 0 6px rgba(102,255,102,0.25);
+}
+
+.cart-item-era {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-faint);
+  margin-bottom: 2px;
+}
+
+.cart-item-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.cart-item-date {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+
+.cart-item-remove {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-faint);
+  background: none;
+  border: 1px solid var(--border-subtle);
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cart-item-remove:hover { color: var(--danger); border-color: rgba(255,85,85,0.3); background: rgba(255,85,85,0.06); }
+
+.cart-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-top: 1px solid var(--border-rule);
+}
+
+.cart-total {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.cart-total span { color: var(--accent); font-weight: 600; }
+
+.btn-checkout {
+  padding: 10px 28px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg-deep);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+.btn-checkout:hover { background: var(--accent-bright); box-shadow: 0 0 20px rgba(102,255,102,0.2); }
+
+/* Receipt */
+.receipt-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+
+.receipt-overlay.visible { display: flex; }
+
+.receipt-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent-strong);
+  padding: 40px;
+  max-width: 460px;
+  text-align: center;
+  animation: receiptIn 0.4s ease;
+  box-shadow: 0 0 40px rgba(102,255,102,0.08);
+}
+
+@keyframes receiptIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.receipt-icon {
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  letter-spacing: 4px;
+}
+
+.receipt-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  text-shadow: 0 0 8px rgba(102,255,102,0.25);
+}
+
+.receipt-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.receipt-close {
+  padding: 8px 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: 1px solid var(--border-accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.receipt-close:hover { background: var(--accent-glow); }
+
+/* ABOUT VIEW */
+.about-content {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 64px) clamp(16px, 3vw, 32px);
+}
+
+.about-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 6vw, 56px);
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  margin-bottom: 32px;
+}
+
+.about-title em { color: var(--amber); font-style: normal; }
+
+.about-block { margin-bottom: 28px; }
+
+.about-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--amber);
+  margin-bottom: 10px;
+}
+
+.about-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.about-divider { border: none; border-top: 1px solid var(--border-subtle); margin: 32px 0; }
+
+.about-ux-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.about-ux-card {
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  text-align: center;
+}
+
+.about-ux-card.current { border-color: var(--border-accent-strong); box-shadow: 0 0 16px rgba(102,255,102,0.05); }
+
+.about-ux-icon { font-size: 24px; margin-bottom: 8px; }
+
+.about-ux-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.about-ux-desc { font-size: 10px; color: var(--text-dim); }
+
+/* Sources */
+.sources-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-subtle);
+}
+
+.source-item {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.source-item:last-child { border-bottom: none; }
+
+.source-num {
+  padding: 10px 12px;
+  color: var(--text-faint);
+  background: rgba(102,255,102,0.02);
+  border-right: 1px solid var(--border-subtle);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.source-text {
+  padding: 10px 16px;
+  color: var(--text-secondary);
+}
+
+.source-text em {
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+/* Flash */
+.add-flash { animation: flashGreen 0.5s ease; }
+@keyframes flashGreen { 0% { box-shadow: 0 0 0 0 rgba(102,255,102,0.5); } 50% { box-shadow: 0 0 24px 4px rgba(102,255,102,0.15); } 100% { box-shadow: none; } }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .compat-grid { grid-template-columns: 1fr; }
+  .detail-numbers { grid-template-columns: 1fr; }
+  .cart-item { grid-template-columns: 40px 1fr auto; gap: 10px; padding: 12px 14px; }
+  .cart-item-num { font-size: 18px; }
+  .about-ux-cards { grid-template-columns: 1fr; }
+  .nav-brand-sub { display: none; }
+  .spec-row { grid-template-columns: 110px 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-brand" onclick="showView('storefront')">
+    <span class="nav-brand-title">SKEUOMORPHIC <em>ECHOES</em></span>
+    <span class="nav-brand-sub">// ARCHIVE_SHOP v1.0</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" data-view="storefront" onclick="showView('storefront')">Shop</button>
+    <button class="nav-link cart-btn" data-view="cart" onclick="showView('cart')">Cart <span class="cart-badge" id="cartBadge">0</span></button>
+    <button class="nav-link" data-view="about" onclick="showView('about')">About</button>
+  </div>
+</nav>
+
+<div class="page-container">
+
+  <div class="view active" id="view-storefront">
+    <div class="storefront-hero">
+      <div class="hero-system-line">SYS.ARCHIVE — CONNECTION <span class="ok">OK</span> — EST. 3000 BCE</div>
+      <h1 class="hero-title"><span class="glow">THE<br>ARCHIVE</span> <em>SHOP</em></h1>
+      <p class="hero-subtitle">Five collections tracing design elements from their ancient physical origins to the digital ghosts that haunt our screens today.</p>
+      <div class="hero-prompt"><span class="cmd">&gt; SELECT COLLECTION_</span><span class="cursor-blink"></span></div>
+    </div>
+    <div class="collections-section">
+      <div class="section-header">
+        <h2 class="section-title">Collections</h2>
+        <span class="section-count">5 chains · 30 links</span>
+      </div>
+      <div class="collections-grid" id="collectionsGrid"></div>
+    </div>
+  </div>
+
+  <div class="view" id="view-collection">
+    <div class="collection-header">
+      <div class="collection-breadcrumb">
+        <span onclick="showView('storefront')">&gt; SHOP</span>
+        <span class="sep">/</span>
+        <span id="collBreadcrumb">THE_SHOPPING_CART</span>
+      </div>
+      <h1 class="collection-name" id="collName"><span class="glow">SHOPPING</span> <em>CART</em></h1>
+      <p class="collection-blurb" id="collBlurb"></p>
+    </div>
+    <div class="products-section">
+      <div class="section-header">
+        <h2 class="section-title">Evolutionary Links</h2>
+        <span class="section-count" id="prodCount">6 links</span>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+  </div>
+
+  <div class="view" id="view-detail">
+    <div class="detail-view" id="detailContent"></div>
+  </div>
+
+  <div class="view" id="view-cart">
+    <div class="cart-header">
+      <h1 class="cart-title">YOUR <em>CART</em></h1>
+      <p class="cart-subtitle">&gt; ITEMS_QUEUED FOR CHECKOUT</p>
+    </div>
+    <div class="cart-content" id="cartContent"></div>
+  </div>
+
+  <div class="view" id="view-about">
+    <div class="about-content">
+      <h1 class="about-title">ABOUT <em>THIS PROJECT</em></h1>
+      <div class="about-block">
+        <div class="about-label">// What Are Skeuomorphic Echoes?</div>
+        <p class="about-text">Design elements that reference the form, sound, language, or behavior of an older technology. The image of a floppy disc as a save icon. The sound of a camera shutter when taking a screenshot. The act of "hanging up" after a phone call. They are residual traces of hand-powered, mechanical, and electronic tools that persist in our virtual interfaces — echoes of physical constraints that no longer exist.</p>
+      </div>
+      <hr class="about-divider">
+      <div class="about-block">
+        <div class="about-label">// UX Pattern</div>
+        <p class="about-text">This project uses an e-commerce store as its UX pattern. Each evolutionary link in the chain is presented as a "product" that can be browsed, examined, and added to a cart. The pattern mirrors the content itself — you're shopping for the history of shopping.</p>
+      </div>
+      <hr class="about-divider">
+      <div class="about-block">
+        <div class="about-label">// The Primary Chain</div>
+        <p class="about-text">The Shopping Cart — tracing how the act of accumulating purchases evolved from ancient market stalls to the "Add to Cart" button. Six evolutionary links from 3000 BCE to the present, each explored as a product page with specifications, customer reviews, and compatibility data.</p>
+      </div>
+      <hr class="about-divider">
+      <div class="about-block">
+        <div class="about-label">// Locked Collections</div>
+        <p class="about-text">Four additional skeuomorph collections are included in the shop — The Onscreen Keyboard, The Shutter Click, The Envelope, and "Hanging Up." Each collection page describes the skeuomorph, but the individual evolutionary links are not yet available for purchase.</p>
+      </div>
+      <hr class="about-divider">
+      <div class="about-block">
+        <div class="about-label">// Sources</div>
+        <p class="about-text" style="margin-bottom:16px;">Historical facts, dates, and figures referenced across the evolutionary links were drawn from the following sources. Customer reviews are fictional and written for the e-commerce UX pattern.</p>
+        <div class="sources-list">
+          <div class="source-item"><span class="source-num">01</span><span class="source-text">Grandclément, C. "Wheeling One's Groceries Around the Store: The Invention of the Shopping Cart, 1936–1953." <em>Food, Culture & Society</em>, 2006.</span></div>
+          <div class="source-item"><span class="source-num">02</span><span class="source-text">Wilson, Terry P. <em>The Cart That Changed the World: The Career of Sylvan N. Goldman.</em> University of Oklahoma Press, 1978.</span></div>
+          <div class="source-item"><span class="source-num">03</span><span class="source-text">Whitaker, Jan. <em>Service and Style: How the American Department Store Fashioned the Middle Class.</em> St. Martin's Press, 2006.</span></div>
+          <div class="source-item"><span class="source-num">04</span><span class="source-text">Emmet, Boris and John Jeuck. <em>Catalogues and Counters: A History of Sears, Roebuck and Company.</em> University of Chicago Press, 1950.</span></div>
+          <div class="source-item"><span class="source-num">05</span><span class="source-text">Standage, Tom. <em>The Victorian Internet.</em> Walker & Company, 1998.</span></div>
+          <div class="source-item"><span class="source-num">06</span><span class="source-text">Kurtulmuş, Fatih (Grand Bazaar Board Chairman). Interview with Anadolu Agency on the history and restoration of the Grand Bazaar. <em>Daily Sabah</em>, September 5, 2018.</span></div>
+          <div class="source-item"><span class="source-num">07</span><span class="source-text">Friedman, Walter A. <em>Birth of a Salesman: The Transformation of Selling in America.</em> Harvard University Press, 2004.</span></div>
+          <div class="source-item"><span class="source-num">08</span><span class="source-text">Miller, Michael B. <em>The Bon Marché: Bourgeois Culture and the Department Store, 1869–1920.</em> Princeton University Press, 1981.</span></div>
+          <div class="source-item"><span class="source-num">09</span><span class="source-text">Braudel, Fernand. <em>Civilization and Capitalism, 15th–18th Century: The Wheels of Commerce.</em> Harper & Row, 1982.</span></div>
+          <div class="source-item"><span class="source-num">10</span><span class="source-text">U.S. Census Bureau. "E-Commerce Retail Sales." Quarterly Reports, 2020–2024.</span></div>
+          <div class="source-item"><span class="source-num">11</span><span class="source-text">Baymard Institute. "Cart Abandonment Rate Statistics." Updated 2024.</span></div>
+          <div class="source-item"><span class="source-num">12</span><span class="source-text">Norman, Donald A. <em>The Design of Everyday Things.</em> Basic Books, 2013 (revised edition).</span></div>
+        </div>
+      </div>
+      <hr class="about-divider">
+      <div class="about-block">
+        <div class="about-label">// System Info</div>
+        <p class="about-text">Skeuomorphic Echoes: From Atoms to Pixels. Built with HTML, CSS, and JavaScript. Terminal aesthetic powered by IBM Plex Mono and Syne. CRT effects include scanlines, phosphor glow, screen flicker, and vignette.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="receipt-overlay" id="receiptOverlay" onclick="closeReceipt(event)">
+  <div class="receipt-card">
+    <div class="receipt-icon">■ ■ ■ CONFIRMED ■ ■ ■</div>
+    <div class="receipt-title">COLLECTION ACQUIRED</div>
+    <p class="receipt-text">All evolutionary artifacts in this collection have been checked out. Each one represents a step in the chain from physical object to digital ghost — echoes of a material past that persist in our virtual present.</p>
+    <button class="receipt-close" onclick="closeReceipt(event)">&gt; CONTINUE_BROWSING</button>
+  </div>
+</div>
+
+<script>
+const COLLECTIONS = [
+  {
+    id: 'shopping-cart',
+    num: '05',
+    name: 'The Shopping Cart',
+    displayName: ['Shopping', 'Cart'],
+    skeuomorph: 'The "Add to Cart" icon persists even in one-tap purchase flows where the metaphor of wheeling a cart through aisles has completely collapsed.',
+    locked: false,
+    status: 'available',
+    statusLabel: 'Available',
+    links: [
+      {
+        name: 'The Market Stall',
+        era: 'Low-Tech', year: '3000 BCE – Present',
+        displayLines: [{text:'Market', size:'s48'}, {text:'Stall', size:'s64'}],
+        quote: {text:'Come, come! The finest dates in all of Ur!', attr:'— Ancient market saying'},
+        body: 'The open-air market stall is the oldest form of retail. Goods were <strong>displayed on tables or cloths</strong>, and buyers carried purchases by hand, in baskets, or in cloth sacks. There was no browsing in the modern sense — you told the vendor what you wanted, they retrieved it. Every transaction was a <strong>face-to-face negotiation</strong>.',
+        specs: [{k:'Format', v:'Open-air stalls, covered bazaars, periodic fairs'},{k:'Era', v:'Earliest settled civilizations — Mesopotamia, Egypt, Indus Valley'},{k:'Transaction', v:'Barter initially, then coins; always face-to-face'},{k:'Bag Policy', v:'Bring your own — baskets, sacks, or servants'},{k:'Return Policy', v:'Argue loudly until the vendor relents'},{k:'Availability', v:'Still thriving — farmers markets and bazaars worldwide'}],
+        reviews: [
+          {stars:5, author:'VERIFIED BUYER · UR, 2800 BCE', title:'The only way to buy', body:'Walked to the river market at dawn. Squeezed every fig. Haggled the grain merchant down by two handfuls. Carried everything home on my head. This is shopping.', tag:'Essential'},
+          {stars:4, author:'TRAVELING MERCHANT · SILK ROAD, 200 BCE', title:'Great selection, heavy carry', body:'Incredible variety between stalls, but my arms gave out after the spice vendor. Need some way to carry more — maybe a bigger basket? Would buy again.', tag:'Frequent Shopper'},
+          {stars:3, author:'ANONYMOUS · AGORA, ATHENS', title:'Too much haggling', body:'I just want to know the price. Why does everything require a twenty-minute negotiation? Also, the fish stall smell is unbearable by noon.', tag:'Casual Browser'}
+        ],
+        box: [{label:'The Social Experience', desc:'Shopping as a communal, face-to-face activity'},{label:'Tactile Selection', desc:'Touch, smell, and inspect everything before buying'},{label:'Price Negotiation', desc:'Every transaction is a conversation, not a number'},{label:'Physical Limits', desc:'You can only buy what your body can carry home'}],
+        compat: {works:'Baskets, cloth sacks, pack animals, servants, barter tokens, early coinage', replaced:'Nothing — this is the origin of retail commerce itself'},
+        shipping: 'Spread with settled civilization. Wherever people gathered, markets formed. From Mesopotamian bazaars (3000 BCE) to Greek agoras to medieval European market squares. The market stall model has never gone extinct — it simply spawned every other form of retail.',
+        footnote: 'The word "bazaar" comes from Persian bāzār. The Grand Bazaar in Istanbul, built in 1461, contains over 4,000 shops and is still one of the world\'s most-visited markets.'
+      },
+      {
+        name: 'The General Store',
+        era: 'Mechanical', year: '1700s – 1950s',
+        displayLines: [{text:'General', size:'s48'}, {text:'Store', size:'s64'}],
+        quote: {text:"If we don't have it, you don't need it.", attr:'— Common general store motto'},
+        body: 'The general store put goods <strong>behind a counter</strong>. The shopkeeper was a gatekeeper — you asked for what you wanted, and they retrieved it from shelves behind them. Purchases accumulated <strong>on the counter</strong> until you were done, then everything was tallied, wrapped, and carried out. The counter was the original "cart" — a holding area between selection and payment.',
+        specs: [{k:'Format', v:'Counter-service retail; goods behind the shopkeeper'},{k:'Checkout', v:'Shopkeeper tallies items on the counter; pays at register'},{k:'Payment', v:'Cash, barter, or credit ledger ("put it on my tab")'},{k:'Bag Policy', v:'Paper bags and string-tied packages provided'},{k:'Inventory', v:'Approximately 300 product types'},{k:'Availability', v:'Nearly extinct — convenience stores are descendants'}],
+        reviews: [
+          {stars:5, author:'REGULAR CUSTOMER · RURAL OHIO, 1890', title:'Mr. Henderson knows exactly what I need', body:'Walked in, asked for flour, sugar, and lamp oil. He had it wrapped before I finished my sentence. Put it on my tab like always. That counter holds everything while we chat about the weather.', tag:'Loyal Customer'},
+          {stars:4, author:'TRAVELING SALESMAN · MIDWEST, 1920', title:'Reliable but limited', body:'Solid basics but if you want anything fancy, forget it. Wish I could browse the shelves myself instead of asking for everything by name. Still — credit is king out here.', tag:'Road Warrior'},
+          {stars:2, author:'ANONYMOUS · SMALL TOWN, 1935', title:'One store, one price, no choice', body:'There\'s no competition. Mr. Peters charges what he wants because there\'s nowhere else to go. I miss the market days where you could at least haggle. And I can never see what\'s on the top shelf.', tag:'Frustrated'}
+        ],
+        box: [{label:'Fixed Location', desc:'A permanent, dedicated space for buying goods'},{label:'Credit System', desc:'The ledger — buy now, pay later'},{label:'The Counter', desc:'A staging area for accumulating purchases before payment'},{label:'Paper Packaging', desc:'Items wrapped and bagged for the journey home'}],
+        compat: {works:'Cash registers, credit ledgers, paper bags, delivery wagons, catalog supplements', replaced:'The open-air market for everyday goods in rural communities'},
+        shipping: 'Spread with westward expansion in America and colonial trade networks globally. By the 1800s, every small town had one. The format dominated retail for 250 years before the department store and supermarket displaced it.',
+        footnote: 'Many general stores extended credit using a ledger — "put it on my tab." This concept of deferred payment would eventually become the credit card.'
+      },
+      {
+        name: 'The Department Store',
+        era: 'Mechanical', year: '1850s – Present',
+        displayLines: [{text:'Department', size:'s48'}, {text:'Store', size:'s64'}],
+        quote: {text:'Give the lady what she wants.', attr:"— Marshall Field, founder of Marshall Field's"},
+        body: 'The department store revolutionized retail by letting customers <strong>touch the merchandise themselves</strong>. Goods came out from behind the counter and onto open display floors organized by category — departments. For the first time, <strong>browsing</strong> was encouraged. But a new problem emerged: how do you carry everything you want to buy across a massive multi-floor store?',
+        specs: [{k:'Format', v:'Multi-floor, self-service, organized by department'},{k:'Innovation', v:'Fixed prices, display windows, free entry, returns accepted'},{k:'Checkout', v:'Central cash wrap or department-level registers'},{k:'Bag Policy', v:'Shopping bags provided; sometimes boxes for larger items'},{k:'Sq. Footage', v:'Up to 1,000,000+ sq. ft. (largest stores)'},{k:'Availability', v:'Declining — many iconic locations have closed'}],
+        reviews: [
+          {stars:5, author:'SOCIETY COLUMNIST · PARIS, 1860', title:'Le Bon Marché has changed everything', body:'For the first time, a woman can enter a store, wander freely, touch the silks and examine the glassware without being interrogated by a shopkeeper. The window displays alone are worth the visit. I spent three hours and my arms were full.', tag:'Early Adopter'},
+          {stars:4, author:'DEPARTMENT MANAGER · CHICAGO, 1910', title:'The full-arms problem is real', body:'Customers love browsing — the escalators, the displays, the freedom. But I watch them struggle. Arms full of hatboxes and fabric bolts, trying to get to millinery on the fourth floor. We need to solve the carrying problem.', tag:'Industry Insider'},
+          {stars:3, author:'ANONYMOUS · NEW YORK, 1975', title:'Lost in the sprawl', body:'I came for socks and somehow ended up in the furniture department on the seventh floor. These places are designed to make you wander. My feet hurt and I bought things I didn\'t need because I didn\'t want to walk back to put them down.', tag:'Impulse Buyer'}
+        ],
+        box: [{label:'Self-Service Browsing', desc:'Touch, examine, and compare products freely'},{label:'Window Displays', desc:'Visual merchandising as art and advertisement'},{label:'Departmental Categories', desc:'Goods organized by type — the ancestor of website navigation'},{label:'The Full-Arms Problem', desc:'Shopping desire outpaces physical carrying capacity'}],
+        compat: {works:'Escalators, elevators, price tags, display cases, pneumatic tube cash systems, shopping bags', replaced:'The general store counter model for urban retail; the shopkeeper as gatekeeper'},
+        shipping: 'Le Bon Marché (Paris, 1852) launched the model. Spread to major cities worldwide within decades — Selfridges (London), Marshall Field\'s (Chicago), Macy\'s (New York). By 1960, department stores anchored suburban malls. Decline began in the 2000s as e-commerce absorbed their core function.',
+        footnote: "Le Bon Marché introduced fixed prices, free entry, and the ability to exchange or return goods — all radical ideas at the time."
+      },
+      {
+        name: 'The Shopping Cart',
+        era: 'Mechanical', year: '1937 – Present',
+        displayLines: [{text:'Shopping', size:'s48'}, {text:'Cart', size:'s64'}],
+        quote: {text:"Look, everyone's using them!", attr:"— Sylvan Goldman's hired shoppers, demonstrating his new carts"},
+        body: 'In 1937, Oklahoma grocery store owner Sylvan Goldman watched shoppers <strong>stop buying when their arms were full</strong>. His solution: a folding metal frame on wheels with two wire baskets — the shopping cart. Customers initially resisted (men thought it was effeminate; women thought it looked like a baby carriage). Goldman hired <strong>fake shoppers</strong> to push carts around the store. Within years, the cart was universal.',
+        specs: [{k:'Inventor', v:'Sylvan Goldman, Oklahoma City'},{k:'Year', v:'1937 — the "folding basket carrier"'},{k:'Materials', v:'Tubular steel frame, wire baskets, rubber wheels'},{k:'Capacity', v:'~150 liters (modern standard cart)'},{k:'Unit Cost', v:'Approximately $200 per cart'},{k:'Availability', v:'Universal — 35M+ carts in the U.S. alone'}],
+        reviews: [
+          {stars:5, author:'STORE OWNER · OKLAHOMA CITY, 1940', title:'Sales doubled overnight', body:'Before the cart, people stopped buying when their arms got full. Now they fill the cart and keep going. Average purchase is up over 100%. My only regret is not inventing it sooner. Those squeaky wheels are the sound of money.', tag:'Game Changer'},
+          {stars:4, author:'SHOPPER · SUBURBAN AMERICA, 1965', title:'Changed how I shop', body:'I used to make a list and buy only what was on it. Now I wander the aisles and toss things in as I see them. The cart makes it too easy. My husband says that\'s the point. The wobbly front wheel is annoying though.', tag:'Impulse Enabled'},
+          {stars:1, author:'SKEPTIC · OKLAHOMA, 1937', title:'I am NOT using a baby carriage', body:'Real men carry their groceries. This wheeled contraption is beneath my dignity. I told Mr. Goldman as much. He pointed at the other shoppers using them. I suspect they work for him.', tag:'Early Adopter Refusal'}
+        ],
+        box: [{label:'Unlimited Capacity', desc:'Shopping limited by cart size, not arm strength'},{label:'The Session', desc:'A temporary collection of items reviewed before commitment'},{label:'Impulse Buying', desc:'More room in the cart means more unplanned purchases'},{label:'The Checkout Line', desc:'All items processed at a single endpoint before exit'}],
+        compat: {works:'Supermarket aisles (redesigned to cart width), checkout lanes, parking lots, child seats', replaced:'Hand baskets, shopping bags, the physical constraint that naturally limited spending'},
+        shipping: 'Oklahoma City, 1937. Adopted nationwide within a decade. By the 1950s, no American supermarket was without one. Spread globally with the supermarket model. The shopping cart icon entered digital interfaces in the mid-1990s with the first e-commerce websites.',
+        footnote: 'Goldman became a multimillionaire from his cart patent. The shopping cart increased average grocery purchase by over 100%. Store layouts were redesigned around cart-width aisles.'
+      },
+      {
+        name: 'The Mail-Order Catalog',
+        era: 'Mechanical → Digital', year: '1872 – 2000s',
+        displayLines: [{text:'Mail-Order', size:'s48'}, {text:'Catalog', size:'s64'}],
+        quote: {text:'Send no money! Examine the goods in your own home.', attr:'— Richard Sears'},
+        body: "The mail-order catalog let you <strong>shop without entering a store</strong>. You browsed a printed book of products, marked your selections on an order form, and mailed it with payment. Your items arrived weeks later by post or railway express. The catalog introduced <strong>remote shopping</strong> — but kept the concept of browsing, selecting, and an accumulated \"order\" (the proto-cart).",
+        specs: [{k:'Pioneer', v:'Montgomery Ward (1872), Sears Roebuck (1893)'},{k:'Format', v:'Printed paper catalog, up to 1,000+ pages'},{k:'Checkout', v:'Mail-in order form with check or money order'},{k:'Delivery', v:'US Mail, Railway Express, later UPS/FedEx'},{k:'Wait Time', v:'2–6 weeks from order to arrival'},{k:'Availability', v:'Extinct in print — direct ancestor of every product page online'}],
+        reviews: [
+          {stars:5, author:'FARM WIFE · NEBRASKA, 1905', title:'The whole world delivered to my door', body:'Nearest store is 40 miles. The Sears catalog has everything — dresses, tools, even a kit to build an entire house. I dog-ear the pages I want and fill out the form at the kitchen table. It\'s like having a department store in my hands.', tag:'Rural Essential'},
+          {stars:4, author:'CATALOG DESIGNER · SEARS HQ, 1960', title:'The original product page', body:'Every item gets a photo, a description, a price, and a stock number. We organize by category with an index in the back. It\'s essentially a website printed on paper. The order form is the checkout page. Dog-eared pages are the wish list.', tag:'Ahead of Its Time'},
+          {stars:3, author:'IMPATIENT BUYER · 1985', title:'Six weeks is an eternity', body:'Ordered a winter coat in September. Arrived in November. By then I\'d already bought one at the mall. The catalog is amazing for browsing, but the wait kills the magic. If only they could deliver faster somehow.', tag:'Foreshadowing'}
+        ],
+        box: [{label:'Shopping from Home', desc:'Browse and buy without leaving the kitchen table'},{label:'The Product Page', desc:'Photo + description + price — the format Amazon inherited'},{label:'The Wish List', desc:'Dog-eared pages marking items to revisit'},{label:'The Order Form', desc:'A paper "cart" — mark quantities, total the cost, submit all at once'}],
+        compat: {works:'US Postal Service, railway express, money orders, printed photography, telephone ordering (later)', replaced:'The general store as the sole source of goods for rural communities'},
+        shipping: 'Montgomery Ward mailed the first catalog in 1872. Sears followed in 1893 and quickly became dominant. By the mid-20th century, catalog sales rivaled department stores. Print catalogs peaked in the 1980s and declined sharply with the rise of e-commerce in the 2000s.',
+        footnote: 'The Sears catalog was so ubiquitous in rural America that it was commonly used as toilet paper in outhouses — and when Sears switched from newsprint to glossy paper, they received complaints.'
+      },
+      {
+        name: 'The E-Commerce Cart',
+        era: 'Digital / Virtual', year: '1994 – Present',
+        displayLines: [{text:'E-Commerce', size:'s48'}, {text:'Cart', size:'s64'}],
+        quote: {text:'Add to Cart.', attr:'— Every website, ever'},
+        body: 'In 1994, NetMarket processed the first secure online purchase. Within a decade, Amazon, eBay, and countless retailers had adopted the <strong>shopping cart metaphor</strong> — a digital holding area where items accumulate during a browsing session before "checkout." The icon is typically a wire cart or basket. The language is pure skeuomorphism: <strong>"Add to Cart," "Checkout," "Aisle," "Basket."</strong> None of these physical objects or spaces exist.',
+        specs: [{k:'Origin', v:'NetMarket (1994), Amazon (1995), eBay (1995)'},{k:'Format', v:'Digital holding area; database entries and session cookies'},{k:'Checkout', v:'Multi-step form: cart → shipping → payment → confirm'},{k:'Delivery', v:'Physical goods ship; digital goods download instantly'},{k:'Abandonment', v:'~70% of carts are abandoned before checkout'},{k:'Availability', v:'Universal — $5.8 trillion in global e-commerce (2023)'}],
+        reviews: [
+          {stars:5, author:'EARLY ADOPTER · AOL, 1998', title:'Bought a book without pants on', body:'Ordered a novel from Amazon at 2 AM in my underwear. It arrived three days later. No driving, no parking, no checkout line. The future is here. The cart icon is cute — looks just like the real thing.', tag:'Convert'},
+          {stars:4, author:'UX DESIGNER · SAN FRANCISCO, 2015', title:'The metaphor that won\'t die', body:'We tried replacing "Add to Cart" with "Save for Later" and "Begin Order." Conversion dropped 23%. Turns out people want the cart. They want to "browse," "pick up," and "check out" even when none of those verbs describe what\'s actually happening.', tag:'The Metaphor Holds'},
+          {stars:2, author:'RETAIL ANALYST · 2023', title:'70% abandonment is insane', body:'Seven out of ten people fill a cart and walk away. In a physical store, that would mean carts everywhere, blocking aisles. The digital cart has no friction — adding costs nothing, abandoning costs nothing. The metaphor works too well.', tag:'Unintended Consequence'}
+        ],
+        box: [{label:'Shop Anywhere', desc:'Any device, any time zone, any state of dress'},{label:'Infinite Inventory', desc:'No shelf space limits — long tail economics'},{label:'The Cart Icon', desc:'A wire-frame cart or basket referencing a 1937 invention'},{label:'Algorithmic Recs', desc:'"Customers who bought this also bought…" — no shopkeeper needed'}],
+        compat: {works:'Web browsers, mobile apps, payment gateways, recommendation algorithms, delivery networks', replaced:'The mail-order catalog, and increasingly, the physical store itself'},
+        shipping: 'NetMarket (1994) first. Amazon launched in 1995 selling books. By 2000, e-commerce was mainstream. Mobile shopping exploded after 2010. By 2023, over 2.14 billion people shop online. The cart icon and "Add to Cart" language remain universal despite one-tap purchasing and subscription models.',
+        footnote: 'Amazon\'s original "1-Click" ordering patent (1999) tried to eliminate the cart entirely — but the cart metaphor proved so deeply ingrained that it persists even in the age of instant purchase. We still want to "browse" and "collect" before we commit.'
+      }
+    ]
+  },
+  {
+    id: 'keyboard',
+    num: '01',
+    name: 'The Onscreen Keyboard',
+    displayName: ['Onscreen', 'Keyboard'],
+    skeuomorph: 'The QWERTY layout designed in 1873 to prevent mechanical typewriter arms from jamming persists on glass touchscreens that have no moving parts at all.',
+    locked: true,
+    status: 'sold-out',
+    statusLabel: 'Sold Out',
+    lockMsg: 'STOCK_DEPLETED — THESE LINKS HAVE BEEN CLAIMED. CHECK BACK NEXT RESTOCK.',
+    links: [
+      {name:'Quill & Parchment', era:'Low-Tech', year:'3000 BCE – 1800s', displayLines:[{text:'Quill &',size:'s48'},{text:'Parchment',size:'s64'}]},
+      {name:'Steel Nib Pen', era:'Mechanical', year:'1820s – 1960s', displayLines:[{text:'Steel Nib',size:'s48'},{text:'Pen',size:'s64'}]},
+      {name:'Manual Typewriter', era:'Mechanical', year:'1873 – 1980s', displayLines:[{text:'Manual',size:'s48'},{text:'Typewriter',size:'s64'}]},
+      {name:'Electric Typewriter', era:'Electromechanical', year:'1930s – 1990s', displayLines:[{text:'Electric',size:'s48'},{text:'Typewriter',size:'s64'}]},
+      {name:'Computer Keyboard', era:'Digital', year:'1970s – Present', displayLines:[{text:'Computer',size:'s48'},{text:'Keyboard',size:'s64'}]},
+      {name:'Onscreen Keyboard', era:'Virtual', year:'2007 – Present', displayLines:[{text:'Onscreen',size:'s48'},{text:'Keyboard',size:'s64'}]}
+    ]
+  },
+  {
+    id: 'shutter',
+    num: '02',
+    name: 'The Shutter Click',
+    displayName: ['Shutter', 'Click'],
+    skeuomorph: 'Phones play a fake mechanical shutter sound when taking a photo or capturing a screenshot — mimicking the SLR mirror slap even though no moving parts exist.',
+    locked: true,
+    status: 'pre-order',
+    statusLabel: 'Pre-Order',
+    lockMsg: 'PRE-ORDER PLACED — THESE LINKS ARE IN PRODUCTION. ESTIMATED ARRIVAL: TBD.',
+    links: [
+      {name:'Camera Obscura', era:'Low-Tech', year:'500 BCE – 1800s', displayLines:[{text:'Camera',size:'s48'},{text:'Obscura',size:'s64'}]},
+      {name:'Daguerreotype', era:'Mechanical', year:'1839 – 1860s', displayLines:[{text:'Daguerr-',size:'s48'},{text:'otype',size:'s64'}]},
+      {name:'Bellows Plate Camera', era:'Mechanical', year:'1850s – 1930s', displayLines:[{text:'Bellows',size:'s48'},{text:'Camera',size:'s64'}]},
+      {name:'35mm SLR', era:'Mechanical', year:'1930s – 2000s', displayLines:[{text:'35mm',size:'s48'},{text:'SLR',size:'s64'}]},
+      {name:'Digital SLR', era:'Digital', year:'1990s – Present', displayLines:[{text:'Digital',size:'s48'},{text:'SLR',size:'s64'}]},
+      {name:'Smartphone Camera', era:'Virtual', year:'2007 – Present', displayLines:[{text:'Smartphone',size:'s48'},{text:'Camera',size:'s64'}]}
+    ]
+  },
+  {
+    id: 'envelope',
+    num: '03',
+    name: 'The Envelope',
+    displayName: ['The', 'Envelope'],
+    skeuomorph: 'The envelope icon represents email despite no physical envelope, seal, stamp, or postmark being involved at any stage of the process.',
+    locked: true,
+    status: 'waitlist',
+    statusLabel: 'Waitlist',
+    lockMsg: 'WAITLIST ACTIVE — JOIN THE QUEUE. THESE LINKS WILL BE RELEASED IN A FUTURE DROP.',
+    links: [
+      {name:'Clay Tablet & Seal', era:'Low-Tech', year:'3000 BCE – 500 BCE', displayLines:[{text:'Clay Tablet',size:'s48'},{text:'& Seal',size:'s64'}]},
+      {name:'Wax-Sealed Letter', era:'Low-Tech', year:'500 BCE – 1800s', displayLines:[{text:'Wax-Sealed',size:'s48'},{text:'Letter',size:'s64'}]},
+      {name:'Paper Envelope', era:'Mechanical', year:'1840s – Present', displayLines:[{text:'Paper',size:'s48'},{text:'Envelope',size:'s64'}]},
+      {name:'Postcard', era:'Mechanical', year:'1860s – Present', displayLines:[{text:'The',size:'s48'},{text:'Postcard',size:'s64'}]},
+      {name:'Fax Machine', era:'Digital', year:'1960s – 2000s', displayLines:[{text:'Fax',size:'s48'},{text:'Machine',size:'s64'}]},
+      {name:'Email', era:'Virtual', year:'1971 – Present', displayLines:[{text:'E-',size:'s48'},{text:'Mail',size:'s64'}]}
+    ]
+  },
+  {
+    id: 'hanging-up',
+    num: '04',
+    name: '"Hanging Up"',
+    displayName: ['Hanging', 'Up'],
+    skeuomorph: 'The red phone handset icon for ending a call references a physical receiver that hasn\'t been the dominant phone form factor for over two decades.',
+    locked: true,
+    status: 'members',
+    statusLabel: 'Members Only',
+    lockMsg: 'MEMBERS_ONLY — UPGRADE YOUR ACCOUNT TO ACCESS THESE EXCLUSIVE LINKS.',
+    links: [
+      {name:'Telegraph Key', era:'Electromechanical', year:'1830s – 1960s', displayLines:[{text:'Telegraph',size:'s48'},{text:'Key',size:'s64'}]},
+      {name:"Bell's Telephone", era:'Electromechanical', year:'1876 – 1900s', displayLines:[{text:"Bell's",size:'s48'},{text:'Telephone',size:'s64'}]},
+      {name:'Candlestick Phone', era:'Mechanical', year:'1890s – 1930s', displayLines:[{text:'Candlestick',size:'s48'},{text:'Phone',size:'s64'}]},
+      {name:'Rotary Desk Phone', era:'Mechanical', year:'1920s – 1980s', displayLines:[{text:'Rotary',size:'s48'},{text:'Phone',size:'s64'}]},
+      {name:'Cordless Phone', era:'Digital', year:'1980s – 2000s', displayLines:[{text:'Cordless',size:'s48'},{text:'Phone',size:'s64'}]},
+      {name:'Smartphone End-Call', era:'Virtual', year:'2007 – Present', displayLines:[{text:'End-Call',size:'s48'},{text:'Button',size:'s64'}]}
+    ]
+  }
+];
+
+// STATE
+let cart = [];
+let currentView = 'storefront';
+let currentCollection = null;
+let currentLinkIndex = 0;
+
+// NAV
+function showView(viewId, scrollTop = true) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + viewId).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const navLink = document.querySelector(`.nav-link[data-view="${viewId}"]`);
+  if (navLink) navLink.classList.add('active');
+  if (['storefront','collection','detail'].includes(viewId)) {
+    const shopLink = document.querySelector('.nav-link[data-view="storefront"]');
+    if (shopLink) shopLink.classList.add('active');
+  }
+  currentView = viewId;
+  if (viewId === 'cart') renderCart();
+  if (scrollTop) window.scrollTo(0, 0);
+}
+
+// STOREFRONT
+function renderCollections() {
+  const grid = document.getElementById('collectionsGrid');
+  grid.innerHTML = COLLECTIONS.map(c => `
+    <div class="collection-card ${c.locked ? 'limited' : ''}" onclick="openCollection('${c.id}')">
+      <div class="card-visual">
+        <div class="card-visual-text">${c.displayName[0]}<br>${c.displayName[1]}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-chain-num">CHAIN_${c.num}</div>
+        <div class="card-title">${c.name}</div>
+        <div class="card-desc">${c.skeuomorph}</div>
+        <div class="card-meta">
+          <span class="card-link-count">${c.links.length} links</span>
+          <span class="card-status ${c.status}">${c.statusLabel}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// COLLECTION
+function openCollection(id) {
+  const coll = COLLECTIONS.find(c => c.id === id);
+  if (!coll) return;
+  currentCollection = coll;
+
+  document.getElementById('collBreadcrumb').textContent = coll.name.toUpperCase().replace(/ /g, '_');
+  document.getElementById('collName').innerHTML = `<span class="glow">${coll.displayName[0].toUpperCase()}</span> <em>${coll.displayName[1].toUpperCase()}</em>`;
+  document.getElementById('collBlurb').textContent = coll.skeuomorph;
+  document.getElementById('prodCount').textContent = coll.links.length + ' links';
+
+  const grid = document.getElementById('productsGrid');
+  const isLocked = coll.locked;
+
+  grid.innerHTML = coll.links.map((link, i) => {
+    const inCart = cart.includes(coll.id + '-' + i);
+    const hasContent = !!link.body; // locked collections have no body text
+    if (isLocked) {
+      return `
+        <div class="product-card locked-link" id="prod-${i}">
+          <div class="product-visual">
+            <span class="product-era">${link.era}</span>
+            <span class="product-link-num">LINK_${String(i+1).padStart(2,'0')}</span>
+            <div class="product-display">
+              <span class="line1">${link.displayLines[0].text}</span>
+              <span class="line2">${link.displayLines[1].text}</span>
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-date-range">${link.year}</div>
+            <div class="product-name">${link.name}</div>
+            <div class="product-teaser">${coll.lockMsg}</div>
+            <div class="product-actions">
+              <button class="btn-locked">${coll.statusLabel.toUpperCase()}</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    return `
+      <div class="product-card" id="prod-${i}" onclick="openDetail(${i})">
+        <div class="product-visual">
+          <span class="product-era">${link.era}</span>
+          <span class="product-link-num">LINK_${String(i+1).padStart(2,'0')}</span>
+          <div class="product-display">
+            <span class="line1">${link.displayLines[0].text}</span>
+            <span class="line2">${link.displayLines[1].text}</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-date-range">${link.year}</div>
+          <div class="product-name">${link.name}</div>
+          <div class="product-teaser">${link.body.replace(/<[^>]*>/g, '').substring(0, 120)}…</div>
+          <div class="product-actions">
+            <button class="btn-add-cart ${inCart ? 'in-cart' : ''}" onclick="event.stopPropagation(); toggleCart('${coll.id}', ${i})">
+              ${inCart ? '✓ IN_CART' : '+ ADD_TO_CART'}
+            </button>
+            <button class="btn-view" onclick="event.stopPropagation(); openDetail(${i})">VIEW</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  showView('collection');
+}
+
+// DETAIL
+function openDetail(index) {
+  if (!currentCollection || currentCollection.locked) return;
+  currentLinkIndex = index;
+  const link = currentCollection.links[index];
+  const inCart = cart.includes(currentCollection.id + '-' + index);
+
+  function renderStars(n) {
+    return '<span class="review-stars">' +
+      Array.from({length:5}, (_,i) => i < n ? '<span class="filled">★</span>' : '<span class="empty">★</span>').join('') +
+      '</span>';
+  }
+
+  const avgStars = (link.reviews.reduce((s,r)=>s+r.stars,0)/link.reviews.length).toFixed(1);
+
+  const html = `
+    <div class="detail-nav">
+      <button class="detail-back" onclick="showView('collection', false)">&lt;-- BACK</button>
+      <div class="detail-pager">
+        <button ${index===0?'disabled':''} onclick="openDetail(${index-1})">← PREV</button>
+        <button ${index===currentCollection.links.length-1?'disabled':''} onclick="openDetail(${index+1})">NEXT →</button>
+      </div>
+    </div>
+
+    <div class="detail-display">
+      <div class="detail-era"><span class="num">LINK_${String(index+1).padStart(2,'0')}</span> · ${link.era}</div>
+      <div class="detail-big-type">
+        ${link.displayLines.map(dl=>`<span class="dline ${dl.size}">${dl.text}</span>`).join('')}
+      </div>
+      <div class="detail-date">${link.year}</div>
+      <button class="detail-add-cart ${inCart?'in-cart':''}" onclick="toggleCart('${currentCollection.id}',${index}); openDetail(${index});">
+        ${inCart ? '✓ IN_YOUR_CART' : '+ ADD_TO_CART'}
+      </button>
+    </div>
+
+    <blockquote class="detail-quote">"${link.quote.text}"</blockquote>
+    <div class="detail-quote-attr">${link.quote.attr}</div>
+
+    <div class="detail-body">${link.body}</div>
+
+    <div class="detail-specs">
+      <div class="specs-header">// Product Specifications</div>
+      ${link.specs.map(s=>`<div class="spec-row"><div class="spec-key">${s.k}</div><div class="spec-val">${s.v}</div></div>`).join('')}
+    </div>
+
+    <div class="detail-reviews">
+      <div class="reviews-header">// Customer Reviews <span class="reviews-avg">${avgStars} ★</span></div>
+      ${link.reviews.map(r=>`
+        <div class="review-card">
+          <div class="review-top">${renderStars(r.stars)}<span class="review-author">${r.author}</span></div>
+          <div class="review-title">${r.title}</div>
+          <div class="review-body">${r.body}</div>
+          <span class="review-tag">${r.tag}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="detail-box">
+      <div class="box-header">// What's in the Box</div>
+      <div class="box-grid">
+        ${link.box.map(b=>`<div class="box-item"><div class="box-item-label">${b.label}</div><div class="box-item-desc">${b.desc}</div></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="detail-compat">
+      <div class="compat-header">// Compatibility</div>
+      <div class="compat-grid">
+        <div class="compat-card works"><div class="compat-label">+ Works With</div><div class="compat-text">${link.compat.works}</div></div>
+        <div class="compat-card replaced"><div class="compat-label">− Replaced</div><div class="compat-text">${link.compat.replaced}</div></div>
+      </div>
+    </div>
+
+    <div class="detail-shipping">
+      <div class="shipping-label">→ Shipping & Availability</div>
+      <div class="shipping-text">${link.shipping}</div>
+    </div>
+
+    <div class="detail-footnote">${link.footnote}</div>
+  `;
+
+  document.getElementById('detailContent').innerHTML = html;
+  showView('detail');
+}
+
+// CART
+function toggleCart(collId, linkIndex) {
+  const key = collId + '-' + linkIndex;
+  const idx = cart.indexOf(key);
+  if (idx > -1) { cart.splice(idx, 1); }
+  else {
+    cart.push(key);
+    const card = document.getElementById('prod-' + linkIndex);
+    if (card) { card.classList.add('add-flash'); setTimeout(()=>card.classList.remove('add-flash'), 500); }
+  }
+  updateCartBadge();
+  if (currentView === 'collection' && currentCollection && !currentCollection.locked) {
+    document.querySelectorAll('.btn-add-cart').forEach((btn, i) => {
+      const inCart = cart.includes(currentCollection.id + '-' + i);
+      btn.className = 'btn-add-cart' + (inCart ? ' in-cart' : '');
+      btn.textContent = inCart ? '✓ IN_CART' : '+ ADD_TO_CART';
+    });
+  }
+}
+
+function updateCartBadge() {
+  const badge = document.getElementById('cartBadge');
+  badge.textContent = cart.length;
+  badge.classList.toggle('visible', cart.length > 0);
+}
+
+function removeFromCart(key) {
+  const idx = cart.indexOf(key);
+  if (idx > -1) cart.splice(idx, 1);
+  updateCartBadge();
+  renderCart();
+}
+
+function renderCart() {
+  const container = document.getElementById('cartContent');
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">&gt; CART_EMPTY</div><div class="cart-empty-text">NO ITEMS QUEUED</div><div class="cart-empty-hint">Browse the collection and add evolutionary artifacts to your cart.</div></div>`;
+    return;
+  }
+  const items = cart.map(key => {
+    const lastDash = key.lastIndexOf('-');
+    const collId = key.substring(0, lastDash);
+    const li = key.substring(lastDash + 1);
+    const coll = COLLECTIONS.find(c => c.id === collId);
+    const link = coll ? coll.links[parseInt(li)] : null;
+    return { key, coll, link, index: parseInt(li) };
+  }).filter(item => item.link);
+
+  container.innerHTML = `
+    <div class="cart-items">
+      ${items.map(item => `
+        <div class="cart-item" onclick="currentCollection = COLLECTIONS.find(c=>c.id==='${item.coll.id}'); openDetail(${item.index})">
+          <div class="cart-item-num">${String(item.index+1).padStart(2,'0')}</div>
+          <div class="cart-item-info">
+            <div class="cart-item-era">${item.link.era}</div>
+            <div class="cart-item-name">${item.link.name}</div>
+            <div class="cart-item-date">${item.link.year}</div>
+          </div>
+          <button class="cart-item-remove" onclick="event.stopPropagation(); removeFromCart('${item.key}')">DEL</button>
+        </div>
+      `).join('')}
+    </div>
+    <div class="cart-summary">
+      <div class="cart-total"><span>${items.length}</span> artifact${items.length!==1?'s':''} queued</div>
+      <button class="btn-checkout" onclick="checkout()">&gt; CHECKOUT</button>
+    </div>
+  `;
+}
+
+function checkout() { document.getElementById('receiptOverlay').classList.add('visible'); }
+
+function closeReceipt(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('receipt-close')) return;
+  document.getElementById('receiptOverlay').classList.remove('visible');
+}
+
+// INIT
+renderCollections();
+updateCartBadge();
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReceipt(e); });
+</script>
+</body>
+</html>
